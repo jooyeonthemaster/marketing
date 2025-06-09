@@ -49,12 +49,18 @@ class NaverMapCrawler:
             self.logger.setLevel(logging.INFO)
     
     async def init_browser(self):
-        """브라우저 초기화 (headless=False로 변경)"""
+        """브라우저 초기화 (환경에 따라 headless 모드 자동 설정)"""
         try:
+            # 환경 감지: Railway/production 환경에서는 headless=True
+            is_production = os.getenv("RAILWAY_ENVIRONMENT") or os.getenv("PORT")
+            headless_mode = True if is_production else False
+            
+            self.logger.info(f"환경 감지: {'Production (headless)' if is_production else 'Development (GUI)'}")
+            
             self.playwright = await async_playwright().start()
             self.browser = await self.playwright.chromium.launch(
-                headless=False,  # headless 모드 비활성화
-                slow_mo=2000,   # 느린 실행으로 탐지 방지
+                headless=headless_mode,  # 환경에 따라 자동 설정
+                slow_mo=1000 if not is_production else 0,   # production에서는 빠르게
                 args=[
                     '--no-sandbox',
                     '--disable-setuid-sandbox',
@@ -67,7 +73,12 @@ class NaverMapCrawler:
                     '--disable-blink-features=AutomationControlled',
                     '--disable-web-security',
                     '--disable-features=TranslateUI',
-                    '--disable-extensions'
+                    '--disable-extensions',
+                    # Production 환경 추가 설정
+                    '--single-process',
+                    '--disable-background-timer-throttling',
+                    '--disable-renderer-backgrounding',
+                    '--disable-backgrounding-occluded-windows'
                 ]
             )
             
