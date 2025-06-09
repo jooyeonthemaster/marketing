@@ -145,19 +145,74 @@ class NaverMapCrawler:
             await self.page.keyboard.press("Enter")
             print("✓ 검색 실행")
             
-            # searchIframe 로드 대기
+            # searchIframe 로드 대기 및 안정적인 접근
             print("searchIframe 로드 대기 중...")
+            
+            # iframe이 완전히 로드될 때까지 더 오래 기다리기
             try:
-                await self.page.wait_for_selector("#searchIframe", timeout=10000)
-                print("✓ searchIframe 발견!")
-            except:
-                print("❌ searchIframe 전환 실패")
+                # iframe 요소가 나타날 때까지 대기
+                await self.page.wait_for_selector("#searchIframe", timeout=15000)
+                print("✓ searchIframe 요소 발견!")
+                
+                # iframe이 완전히 로드될 때까지 추가 대기
+                await asyncio.sleep(3)
+                
+                # iframe 로드 상태 확인
+                iframe_element = await self.page.query_selector("#searchIframe")
+                if iframe_element:
+                    # iframe의 src 속성 확인
+                    src = await iframe_element.get_attribute("src")
+                    print(f"iframe src: {src}")
+                    
+                    # iframe이 완전히 로드될 때까지 대기
+                    await iframe_element.wait_for_element_state("attached")
+                    
+            except Exception as e:
+                print(f"❌ searchIframe 로드 실패: {e}")
                 return []
             
-            # iframe으로 전환
-            search_frame = self.page.frame(name="searchIframe")
+            # iframe으로 전환 - 여러 방법 시도
+            search_frame = None
+            
+            # 방법 1: name으로 접근
+            try:
+                search_frame = self.page.frame(name="searchIframe")
+                if search_frame:
+                    print("✓ 방법1(name) - searchIframe 접근 성공!")
+            except Exception as e:
+                print(f"방법1(name) 실패: {e}")
+            
+            # 방법 2: url로 접근
             if not search_frame:
-                print("❌ searchIframe 프레임을 찾을 수 없음")
+                try:
+                    frames = self.page.frames
+                    for frame in frames:
+                        frame_url = frame.url
+                        if "search" in frame_url.lower() or "place" in frame_url.lower():
+                            search_frame = frame
+                            print(f"✓ 방법2(url) - searchIframe 접근 성공! URL: {frame_url}")
+                            break
+                except Exception as e:
+                    print(f"방법2(url) 실패: {e}")
+            
+            # 방법 3: 선택자로 접근
+            if not search_frame:
+                try:
+                    iframe_element = await self.page.query_selector("#searchIframe")
+                    if iframe_element:
+                        search_frame = await iframe_element.content_frame()
+                        if search_frame:
+                            print("✓ 방법3(selector) - searchIframe 접근 성공!")
+                except Exception as e:
+                    print(f"방법3(selector) 실패: {e}")
+            
+            if not search_frame:
+                print("❌ 모든 방법으로 searchIframe 프레임 접근 실패")
+                # 디버깅을 위해 현재 프레임들 확인
+                frames = self.page.frames
+                print(f"현재 페이지의 프레임 개수: {len(frames)}")
+                for i, frame in enumerate(frames):
+                    print(f"  프레임 {i}: name='{frame.name}', url='{frame.url}'")
                 return []
             
             print("✓ searchIframe으로 전환 성공!")
