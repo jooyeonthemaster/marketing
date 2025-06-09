@@ -108,5 +108,7 @@ async def root():
 
 if __name__ == "__main__":
     import uvicorn
-    print("🚀 네이버 지도 크롤러 API 서버 시작!")
-    uvicorn.run(app, host="0.0.0.0", port=8001) 
+    import os
+    port = int(os.environ.get("PORT", 8001))
+    print(f"🚀 네이버 지도 크롤러 API 서버 시작! (포트: {port})")
+    uvicorn.run(app, host="0.0.0.0", port=port) 
