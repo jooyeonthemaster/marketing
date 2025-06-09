@@ -165,7 +165,7 @@ class NaverMapCrawler:
                     print(f"iframe src: {src}")
                     
                     # iframe이 완전히 로드될 때까지 대기
-                    await iframe_element.wait_for_element_state("attached")
+                    await iframe_element.wait_for_element_state("visible")
                     
             except Exception as e:
                 print(f"❌ searchIframe 로드 실패: {e}")
