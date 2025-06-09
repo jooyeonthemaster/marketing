@@ -26,6 +26,8 @@ app.add_middleware(
         "https://script.google.com",
         "https://docs.google.com",
         "https://frontend-h4ymxz49k-jooyoens-projects-59877186.vercel.app",
+        "https://frontend-7rs3mxylg-jooyoens-projects-59877186.vercel.app",
+        "https://frontend-tern-mu-42.vercel.app",
         "https://marketing-production-71b0.up.railway.app"
     ],
     allow_credentials=True,
