@@ -20,17 +20,8 @@ app = FastAPI(title="네이버 지도 크롤러 API")
 # CORS 설정
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:3001", 
-        "https://script.google.com",
-        "https://docs.google.com",
-        "https://frontend-h4ymxz49k-jooyoens-projects-59877186.vercel.app",
-        "https://frontend-7rs3mxylg-jooyoens-projects-59877186.vercel.app",
-        "https://frontend-tern-mu-42.vercel.app",
-        "https://marketing-production-71b0.up.railway.app"
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],  # 모든 origin 허용
+    allow_credentials=False,  # credentials는 False로 설정
     allow_methods=["*"],
     allow_headers=["*"],
 )
