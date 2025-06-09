@@ -24,7 +24,9 @@ app.add_middleware(
         "http://localhost:3000",
         "http://localhost:3001", 
         "https://script.google.com",
-        "https://docs.google.com"
+        "https://docs.google.com",
+        "https://frontend-h4ymxz49k-jooyoens-projects-59877186.vercel.app",
+        "https://marketing-production-71b0.up.railway.app"
     ],
     allow_credentials=True,
     allow_methods=["*"],
